@@ -151,10 +151,6 @@ export default function Products() {
 		console.log('value', value.target.value)
 		setProductSelectedCategory(value.target.value)
 	}
-	// const confirmDelete = (productId:any) => {
-	//   setProductToDelete(productId);
-	//   onDeleteModalOpen(); // Open confirmation modal
-	// };
 
 	const filterProducts = () => {
 		console.log('in filter products', list, selectedCat)
@@ -194,33 +190,7 @@ export default function Products() {
 			console.error('An error occurred while adding the category:', error)
 		}
 	}
-	// const handleDelete = async () => {
-	//   if (productToDelete) {
-	//     try {
-	//       const accesstoken = Cookies.get('access_token');
 
-	//       const response = await fetch(`http://localhost:8000/products/${productToDelete}/delete/`, {
-	//         method: 'DELETE',
-	//         headers: {
-	//           'Authorization':  `Bearer ${accesstoken}`
-	//         }
-	//       });
-
-	//       if (response.ok) {
-	//         toast.success("Product deleted successfully!");
-	//         console.log("Product deleted successfully");
-	//         setList((prevList:any) => prevList.filter((item:any )=> item.id !== productToDelete));
-	//       } else {
-	//         console.error("Failed to delete product");
-	//       }
-	//     } catch (error) {
-	//       console.error("An error occurred while deleting the product:", error);
-	//     } finally {
-	//       onDeleteModalOpenChange(); // Close the confirmation modal
-	//       fetchProducts()
-	//     }
-	//   }
-	// };
 	const handleDeleteCategories = async () => {
 		if (selectedCategory == null) {
 			alert('Please select a category to delete.')
@@ -416,23 +386,7 @@ export default function Products() {
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
-			{/* <Modal isOpen={isDeleteModalOpen} onOpenChange={onDeleteModalOpenChange}>
-        <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
-          <ModalBody>
-            Are you sure you want to delete this product?
-          </ModalBody>
-          <ModalFooter>
-            <Button color="danger" variant="light" onPress={() => onDeleteModalOpenChange()}>
-              Cancel
-            </Button>
-            <Button color="secondary" onPress={handleDelete}>
-              Confirm
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal> */}
-			{/* Main Page Content */}
+			
 			<div className="mb-5  justify-between items-center  px-8 py-4 bg-secondary rounded-xl">
 				<div className="text-white">
 					<h1 className="text-2xl  font-semibold">Your Products</h1>
@@ -459,13 +413,7 @@ export default function Products() {
 							color="secondary"
 							aria
 							onSelectionChange={(value: any) => setSelectedCat(value)}
-							// classNames={{
-							// 	tabList: 'w-[250px] px-3 py-5 bg-[#e8e8e8] bg-opacity-50',
-							// 	tab: 'bg-opacity-15',
-							// 	cursor: 'w-full  bg-opacity-15  bg-secondary',
-
-							// 	tabContent: 'group-data-[selected=true]:text-secondary '
-							// }}
+							
 							classNames={{
 								base: 'w-full',
 								tabList: 'flex flex-row flex-wrap sm:flex-col px-5 py-5 bg-[#e8e8e8] bg-opacity-50 sm:w-[250px] sm:px-3',
@@ -494,13 +442,7 @@ export default function Products() {
 								isPressable
 								onPress={() => handleProductClick(item.id)} // Use the handler to navigate
 								className="relative group">
-								{/* Delete button */}
-								{/* <button
-              className="absolute top-2 right-2 z-[60] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              onClick={() => confirmDelete(item.id)}
-            >
-              <MdDeleteOutline className="text-white" />
-            </button> */}
+								
 								<CardBody className="overflow-visible p-0">
 									<Image shadow="sm" radius="lg" width="100%" alt={item.name} className="w-full object-cover h-[140px]" src={item.picture} />
 									<div className="absolute z-[50] inset-0 bg-black/10 transition-opacity duration-500 opacity-0 group-hover:opacity-100"></div>

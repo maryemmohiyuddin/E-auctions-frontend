@@ -7,7 +7,7 @@ import { Providers } from "../../providers";
 
 import { siteConfig } from "@/config/sellerSite";
 import { fontSans } from "@/config/fonts";
-import { Navbar } from "@/components/sellerNavbar";
+import { Navbar } from "@/components/bidderNavbar";
 
 
 

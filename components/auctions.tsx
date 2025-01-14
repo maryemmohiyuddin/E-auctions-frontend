@@ -13,6 +13,7 @@ import {DatePicker} from "@nextui-org/react";
 import {now, getLocalTimeZone} from "@internationalized/date";
 import {useLocale, useDateFormatter} from "@react-aria/i18n";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell} from "@nextui-org/react";
+import axios from 'axios';
 
 export default function Auctions() {
   const [list, setList] = useState<any>([]);
@@ -126,7 +127,6 @@ setAuctionData(prev => ({ ...prev, [name]: formattedUtcDate }));
     // Basic validation for fields
     return auctionData.productId && auctionData.startingValue && auctionData.endingTime;
   };
-
   const createAuction = async () => {
     if (!validateFields()) {
       toast.error("Please fill in all fields correctly.");
@@ -136,40 +136,65 @@ setAuctionData(prev => ({ ...prev, [name]: formattedUtcDate }));
     try {
       const accesstoken = Cookies.get('access_token');
       const id = Cookies.get('id');
-
-      const response = await fetch("http://localhost:8000/auctions/create/", {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${accesstoken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user: id,// Add your user id here,
-          product: auctionData.productId,
-          starting_value: auctionData.startingValue,
-          starting_time: new Date().toISOString(),
-          ending_time: new Date(auctionData.endingTime).toISOString(),
-        }),
+      console.log("before api")
+      // Create a timeout promise that will reject after 2 seconds
+      const timeout = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 2000); // 2-second timeout
       });
-      const data = await response.json();
-      if (response.ok) {
+      onOpenChange()
+      // Race between the API call and the timeout
+      const response = await Promise.race([
+        axios.post("http://localhost:8000/auctions/create/", 
+          {
+            user: id, // Add your user id here
+            product: auctionData.productId,
+            starting_value: auctionData.startingValue,
+            starting_time: new Date().toISOString(),
+            ending_time: new Date(auctionData.endingTime).toISOString(),
+          }, 
+          {
+            headers: {
+              'Authorization': `Bearer ${accesstoken}`,
+              'Content-Type': 'application/json',
+            }
+          }
+        ),
+        timeout // Timeout promise
+      ]);
+  
+      // Handle the API response if it completes within 2 seconds
+      if (response) {
+        const data = response.data;
         toast.success("Auction created successfully!");
         // Reset auction data and close modal
         setAuctionData({ productId: undefined, startingValue: '', startingTime: '', endingTime: '' });
         // Optionally, refresh the auction list or perform other actions
-      } else {
-        toast.error(data.detail || "Failed to create auction.");
       }
     } catch (error) {
-      console.error("Error creating auction:", error);
-      toast.error("An error occurred while creating the auction.");
+      if (error.message === 'Request timed out') {
+        // Timeout occurred, call your fallback function
+        console.log('API call timed out, calling fallback function...');
+        yourFallbackFunction(); // Call your fallback function here
+      } else {
+        console.error("Error creating auction:", error);
+        toast.error("An error occurred while creating the auction.");
+      }
     }
     finally{
       onOpenChange();
       fetchAuctions()
 
     }
+    }
+
+  
+  // Define your fallback function
+  const yourFallbackFunction = () => {
+    // This function will be triggered if the API call takes too long (more than 2 seconds)
+fetchAuctions()    // You can add logic here, e.g., show an error message, trigger other actions, etc.
   };
+  
+    
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

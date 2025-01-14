@@ -210,38 +210,7 @@ export default function Dashboard() {
 		}
 		router.push(`/productpage/${product.product.id}/${product.id}`)
 	}
-	//   const handleProductClick =async (product: any) => {
-	// console.log("product", product)
-	//     setSelectedProduct(product);
-	//     fetchBids(product.id);
-	//     onOpen();
-	//     if (searched) {
-	//       try {
-	//       const userId = Cookies.get('id'); // Assuming user ID is saved in cookies
-
-	//         const categoryId = product.product.category; // Replace with the actual category ID
-
-	//         const response = await fetch("http://localhost:8000/search/create-search/", {
-	//           method: "POST",
-	//           headers: { "Content-Type": "application/json" },
-	//           body: JSON.stringify({ user_id: userId, category_id: categoryId }),
-	//         });
-
-	//         if (response.ok) {
-	//           const data = await response.json();
-	//           console.log("Search recorded:", data);
-	//         } else {
-	//           console.error("Failed to record search:", await response.text());
-	//         }
-	//       } catch (error) {
-	//         console.error("Error calling createSearch API:", error);
-	//       }
-
-	//       // Reset the `searched` state after recording the search
-	//       // setSearched(false);
-	//     }
-	//   };
-
+	
 	const handleBidSubmit = async () => {
 		const startingValueAsInteger = Math.floor(selectedProduct.starting_value)
 
@@ -458,13 +427,6 @@ export default function Dashboard() {
 								color="secondary"
 								aria
 								onSelectionChange={(value: any) => setSelectedCat(value)}
-								// classNames={{
-								// 	tabList: 'w-[250px] px-3 py-5 bg-[#e8e8e8] bg-opacity-50 ',
-								// 	tab: 'bg-opacity-15',
-								// 	cursor: 'w-full  bg-opacity-15  bg-secondary',
-
-								// 	tabContent: 'group-data-[selected=true]:text-secondary '
-								// }}
 								classNames={{
 									base: 'w-full',
 									tabList: 'flex flex-row flex-wrap sm:flex-col px-5 py-5 bg-[#e8e8e8] bg-opacity-50 sm:w-[250px] sm:px-3',

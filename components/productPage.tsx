@@ -349,7 +349,7 @@ export default function ProductPage({productid, auctionid}: any) {
 			{productDetail && (
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-7 mb-10">
 					<div className="flex justify-start items-start col-span-1 ">
-						<Image alt="NextUI Album Cover" className="object-cover border border-gray-300 w-[700px] h-[700px]" src={productDetail?.picture} />
+						<Image alt="NextUI Album Cover" className="object-contain border border-gray-300 w-[700px] h-[700px]" src={productDetail?.picture} />
 					</div>
 
 					<div className="col-span-1 flex flex-col gap-2">
@@ -357,24 +357,24 @@ export default function ProductPage({productid, auctionid}: any) {
 						<h1 className="text-4xl font-bold">{productDetail.name}</h1>
 
 						<h1 className="text-md mt-5">
-							<span className="font-bold text-secondary">Category: </span>
+							<span className="font-bold text-gray-500">Category: </span>
 							{categories.find((cat: any) => cat.id === productDetail?.category)?.name || 'Category not found'}
 						</h1>
 
 						<h1 className="text-md">
-							<span className="font-bold text-secondary">Material: </span>
+							<span className="font-bold text-gray-500">Material: </span>
 							{productDetail.Material}
 						</h1>
 						<h1 className="text-md">
-							<span className="font-bold text-secondary">Dimensions: </span>
+							<span className="font-bold text-gray-500">Dimensions: </span>
 							{productDetail.height} * {productDetail.width} inches
 						</h1>
 						<h1 className="text-md">
-							<span className="font-bold text-secondary">Weight: </span>
+							<span className="font-bold text-gray-500">Weight: </span>
 							{productDetail.weight} kg
 						</h1>
 						<h1 className="text-md mb-5">
-							<span className="font-bold text-secondary">Year of Manufacture: </span>
+							<span className="font-bold text-gray-500">Year of Manufacture: </span>
 							{productDetail.yearOfManufacture}
 						</h1>
 
@@ -398,7 +398,7 @@ export default function ProductPage({productid, auctionid}: any) {
 							</p>
 						</div>
 						<div className="flex gap-4 items-end justify-end mb-10 mt-3">
-							<Button onClick={() => openBidModal(productDetail.id)}>Bid</Button>
+							<Button color={'secondary'} onClick={() => openBidModal(productDetail.id)}>Bid</Button>
 						</div>
 					</div>
 				</div>
@@ -461,7 +461,7 @@ export default function ProductPage({productid, auctionid}: any) {
 						</ModalBody>
 						<ModalFooter>
 							{!hasPlacedBid && (
-								<Button auto onClick={handleBidSubmit} disabled={hasPlacedBid}>
+								<Button color={'secondary'} auto onClick={handleBidSubmit} disabled={hasPlacedBid}>
 									Place Bid
 								</Button>
 							)}

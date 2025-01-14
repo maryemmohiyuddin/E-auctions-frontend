@@ -382,7 +382,7 @@ export default function Dashboard() {
 			)}
 			{searchCategory.length > 0 && (
 				<div>
-					<h2 className="text-2xl mt-5 font-semibold">Search Based Suggestions</h2>
+					<h2 className="text-2xl mt-5 font-semibold">Suggestions for you</h2>
 					<p className="mb-10">Bid on the projects of your choice.</p>
 					<div className="relative w-full">
 						{/* Scroll Arrows */}
@@ -517,6 +517,8 @@ export default function Dashboard() {
 								<h4 className=" flex gap-5 font-semibold items-center ">
 									Bidding Leaders
 									<IoIosRefresh
+
+									
 										size={14}
 										className={`cursor-pointer ml-2 ${loading ? 'animate-spin' : ''}`}
 										onClick={() => handleRefreshBids(selectedProduct.id)} // Pass a function reference

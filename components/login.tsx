@@ -58,6 +58,8 @@ export const Login = () => {
       if (!response.ok) {
         const errorData = await response.json();
         toast.error("Invalid email or password."); // Display error message
+      setLoading(false); // Reset loading state in the end
+
         return;
       }
 

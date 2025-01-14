@@ -19,14 +19,33 @@ import React, {useState, useEffect} from 'react'
 import {siteConfig} from '@/config/sellerSite'
 import {ThemeSwitch} from '@/components/theme-switch'
 import {TwitterIcon, GithubIcon, DiscordIcon, HeartFilledIcon, SearchIcon, Logo} from '@/components/icons'
-
+import {
+	Modal,
+	ModalContent,
+	ModalHeader,
+	ModalBody,
+	ModalFooter,
+	
+	useDisclosure,
+  } from "@nextui-org/react";
+  
 export const Navbar = () => {
 	const router = useRouter()
+	const [name, setName] = useState(null);
+	const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
+	useEffect(() => {
+	const name =Cookies.get('name')  ? Cookies.get('name') : ""// Replace 'userEmail' with the actual key used for the email in your cookies
+
+	  // Simulating fetching or deriving the name on the client
+	  setName(name);
+	}, []);
 	const [notifications, setNotifications] = useState<any>([])
 	const [activeItem, setActiveItem] = useState<string>('') // State for active item
 
 	// Read the email from the cookies
 	const userEmail = Cookies.get('email') // Replace 'userEmail' with the actual key used for the email in your cookies
+
 	const fetchNotifications = async () => {
 		try {
 			const accesstoken = Cookies.get('access_token')
@@ -79,8 +98,79 @@ export const Navbar = () => {
 		/>
 	)
 	const pathname = usePathname() // Get current route
+	const [formData, setFormData] = useState({ name: '', password: '', confirmPassword: '' })
+	const [errors, setErrors] = useState({ name: '', password: '', confirmPassword: '' })
+	useEffect(() => {
+		const savedName = Cookies.get('name') || ''
+		setName(savedName)
+		setFormData((prev) => ({ ...prev, name: savedName }))
+	  }, [])
+	  const validateForm = () => {
+		const newErrors: typeof errors = { name: '', password: '', confirmPassword: '' }
+	
+		if (!formData.name.trim()) newErrors.name = 'Name is required.'
+		if (formData.password && formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters.'
+		if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match.'
+	
+		setErrors(newErrors)
+		return Object.values(newErrors).every((error) => !error)
+	  }
+	  const handleUpdateProfile = async () => {
+		if (!validateForm()) return
+	
+		const accessToken = Cookies.get('access_token')
+		const email = Cookies.get('email')
+
+		const apiBody: any = { name: formData.name }
+		if (formData.password) apiBody.password = formData.password
+		if (email) apiBody.email = email
+
+	
+		try {
+		  const response = await fetch('http://localhost:8000/users/update-profile/', {
+			method: 'PUT',
+			headers: {
+			  Authorization: `Bearer ${accessToken}`,
+			  'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(apiBody),
+		  })
+	
+		  if (!response.ok) {
+			console.error('Failed to update profile.')
+			const savedName = Cookies.get('name') || ''
+			setFormData((prev) => ({ ...prev, name: savedName }))
+			return
+		  }
+	
+		  const data = await response.json()
+		  console.log('Profile updated:', data)
+		  Cookies.set('name', formData.name)
+		  setName(formData.name)
+		  onOpenChange()
+		} catch (err) {
+		  console.error('Error updating profile:', err)
+		  const savedName = Cookies.get('name') || ''
+		setFormData((prev) => ({ ...prev, name: savedName }))
+		}
+		finally{
+			onOpenChange()
+		setFormData((prev) => ({ ...prev, password: '' }))
+		setFormData((prev) => ({ ...prev, confirmPassword: '' }))
+
+
+
+
+		}
+	  }
+	
+	const handleInputChange = (field: keyof typeof formData, value: string) => {
+		setFormData((prev) => ({ ...prev, [field]: value }))
+		setErrors((prev) => ({ ...prev, [field]: '' })) // Clear errors on input change
+	  }
 
 	return (
+		<>
 		<NextUINavbar isBordered className="shadow-sm" maxWidth="xl" position="sticky">
 			<NavbarContent className="basis-1/5 sm:basis-full" justify="start">
 				<NavbarBrand as="li" className="gap-3 max-w-fit">
@@ -125,9 +215,15 @@ export const Navbar = () => {
 				<Dropdown placement="bottom-end">
 					<DropdownTrigger>
 						<div className="flex justify-center items-center">
+							{notifications.length > 0 &&(
 							<Badge content={notifications.length} size="sm" shape="circle" color="danger">
 								<NotificationIcon size={24} className="opacity-65 cursor-pointer" />
 							</Badge>
+							)}
+							{notifications.length==0&&(
+								<NotificationIcon size={24} className="opacity-65 cursor-pointer" />
+
+							)}
 						</div>
 					</DropdownTrigger>
 
@@ -156,19 +252,71 @@ export const Navbar = () => {
 
 				<Dropdown placement="bottom-end">
 					<DropdownTrigger>
-						<Avatar isBordered as="button" className="transition-transform" color="secondary" name="User Avatar" size="sm" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
+						<Avatar isBordered as="button" className="transition-transform" color="secondary" name={name?.charAt(0).toUpperCase() || "?"} size="sm"  />
 					</DropdownTrigger>
 					<DropdownMenu aria-label="Profile Actions" variant="flat">
 						<DropdownItem key="profile" className="h-14 gap-2">
 							<p className="font-semibold">Signed in as</p>
 							<p className="font-semibold">{userEmail || 'No email found'}</p>
 						</DropdownItem>
+							<DropdownItem key="logout" color="secondary" onClick={onOpen}>
+													Update Profile
+												</DropdownItem>
 						<DropdownItem key="logout" color="danger" onClick={onLogout}>
 							Log Out
 						</DropdownItem>
 					</DropdownMenu>
 				</Dropdown>
+				<div>{name || ""}</div>
+
 			</NavbarContent>
 		</NextUINavbar>
+		<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+              <ModalBody>
+			  <Input
+            label="Name"
+            placeholder="Enter your name"
+            value={formData.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+			isInvalid={!!errors.name}
+			errorMessage={errors.name}
+          />
+          <Input
+            label="Password"
+            placeholder="Enter new password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
+			isInvalid={!!errors.password}
+			errorMessage={errors.password}        
+          />
+          <Input
+            label="Confirm Password"
+            placeholder="Confirm new password"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+			isInvalid={!!errors.confirmPassword}
+			errorMessage={errors.confirmPassword}
+          />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="secondary" onPress={handleUpdateProfile}>
+                  Update Profile
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+	  </>
 	)
 }
